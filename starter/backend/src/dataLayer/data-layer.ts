@@ -94,4 +94,45 @@ export default class DataLayer {
 
     return result;
   }
+
+  async updateAttachmentUrl(
+    todoId: string,
+    userId: string,
+    attachmentUrl: string
+  ) {
+    const param = {
+      TableName: this.tableName,
+      Key: {
+        todoId,
+        userId,
+      },
+      UpdateExpression: "set attachmentUrl = :attachmentUrl",
+      ExpressionAttributeValues: {
+        ":attachmentUrl": attachmentUrl,
+      },
+    };
+
+    await this.docClient.update(param).promise();
+
+    this.logger.info("Successfully updated attachmentUrl");
+  }
+
+  async getById(todoId: string, userId: string): Promise<Todo> {
+    const param = {
+      TableName: this.tableName,
+      Key: {
+        todoId,
+        userId,
+      },
+    };
+
+    const result = await this.docClient.get(param).promise();
+
+    const item = result.Item;
+    this.logger.info(
+      `Successfully retrieved Todo: ${item} for user: ${userId}`
+    );
+
+    return item as Todo;
+  }
 }

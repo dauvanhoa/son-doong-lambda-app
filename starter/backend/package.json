@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "Ivan Mushketyk",
+  "author": "Son Doong",
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.214.0",
