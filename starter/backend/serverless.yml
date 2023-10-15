@@ -2,12 +2,55 @@ service: serverless-todo-app
 
 plugins:
   - serverless-iam-roles-per-function
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
+  - serverless-offline
+  - serverless-dynamodb
+  - serverless-s3-local
+  - serverless-webpack
 
 frameworkVersion: '3'
 
 provider:
   name: aws
   runtime: nodejs14.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  tracing:
+    apiGateway: true
+    lambda: true
+  environment:
+    S3_BUCKET_NAME: son-doong-bucket
+    SIGNED_URL_EXPIRATION: 300
+    TODO_TABLE: SonDoongable
+    USER_ID_INDEX: SonDoongUserIdIndex
+    JWKS_URL: https://dev-ubzav6t2jjro4wgw.us.auth0.com/.well-known/jwks.json
+
+custom:
+  documentation:
+    api:
+      info:
+        version: "1.0"
+        title: Son Doong Lambda App
+        description: Son Doong Lambda app demo
+      tags:
+        - name: sodo
+          description: sodo items
+  serverless-offline:
+    httpPort: 5000
+  serverless-dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: true
+      docker: true
+  s3:
+    host: localhost
+    port: 4569
+    directory: ./sodo-bucket/
 
 functions:
 
