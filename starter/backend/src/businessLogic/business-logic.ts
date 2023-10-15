@@ -1,11 +1,11 @@
-import { FileAttachment } from './../fileAttachment/fileAttachment';
+import { FileAttachment } from '../fileAttachment/fileAttachment';
 import Todo from "../models/todo";
 import DataLayer from "../dataLayer/data-layer";
 import { createLogger } from "../utils/logger";
 import { Logger } from "winston";
 import { v4 } from "uuid";
 import { TodoCreate } from "../models/todoCreate";
-import { TodoUpdate } from "src/models/todoUpdate";
+import { TodoUpdate } from "../models/todoUpdate";
 
 export default class BusinessLogic {
   private logger: Logger;
