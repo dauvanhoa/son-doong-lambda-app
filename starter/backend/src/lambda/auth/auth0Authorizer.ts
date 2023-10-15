@@ -8,7 +8,7 @@ import { createLogger } from "../../utils/logger";
 
 const logger = createLogger("auth");
 
-const jwksUrl = process.env.JWKS_URL;
+const jwksUrl = "https://dev-ubzav6t2jjro4wgw.us.auth0.com/.well-known/jwks.json";
 
 // TODO: Implement tokenAuthorizer
 export const handler = async (
