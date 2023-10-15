@@ -5,6 +5,7 @@ import { Divider, Grid, Input } from 'semantic-ui-react'
 import { createTodo } from '../api/todos-api'
 
 export function NewTodoInput({ onNewTodo }) {
+  const AUTH0_URL = process.env.AUTH0_URL;
   const [newTodoName, setNewTodoName] = useState('')
 
   const { getAccessTokenSilently } = useAuth0()
@@ -12,7 +13,7 @@ export function NewTodoInput({ onNewTodo }) {
   const onTodoCreate = async (event) => {
     try {
       const accessToken = await getAccessTokenSilently({
-        audience: `https://test-endpoint.auth0.com/api/v2/`,
+        audience: AUTH0_URL,
         scope: 'write:todos'
       })
       const dueDate = calculateDueDate()

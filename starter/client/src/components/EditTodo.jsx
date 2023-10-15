@@ -10,6 +10,8 @@ const UploadState = {
   UploadingFile: 'UploadingFile'
 }
 
+const AUTH0_URL = process.env.AUTH0_URL;
+
 export function EditTodo() {
   function renderButton() {
     return (
@@ -43,7 +45,7 @@ export function EditTodo() {
 
       setUploadState(UploadState.FetchingPresignedUrl)
       const accessToken = await getAccessTokenSilently({
-        audience: `https://test-endpoint.auth0.com/api/v2/`,
+        audience: AUTH0_URL,
         scope: 'write:todos'
       })
       const uploadUrl = await getUploadUrl(accessToken, todoId)
