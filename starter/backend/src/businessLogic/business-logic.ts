@@ -4,6 +4,7 @@ import { createLogger } from "../utils/logger";
 import { Logger } from "winston";
 import { v4 } from "uuid";
 import { TodoCreate } from "../models/todoCreate";
+import { TodoUpdate } from "src/models/todoUpdate";
 
 export default class BusinessLogic {
   private logger: Logger;
@@ -32,5 +33,15 @@ export default class BusinessLogic {
     this.logger.info(`Creating todo: ${newTodo} for user: ${userId}`);
 
     return await this.todoRepository.create(newTodo);
+  }
+
+  async update(
+    todoId: string,
+    userId: string,
+    todoUpdate: TodoUpdate
+  ): Promise<Todo> {
+    this.logger.info(`Updating todo: ${todoId} for user: ${userId}`);
+
+    return await this.todoRepository.update(todoId, userId, todoUpdate);
   }
 }

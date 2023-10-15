@@ -2,6 +2,7 @@ import Todo from "../models/todo";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { createLogger } from "../utils/logger";
 import { Logger } from "winston";
+import { TodoUpdate } from "src/models/todoUpdate";
 
 export default class DataLayer {
   private logger: Logger;
@@ -44,4 +45,36 @@ export default class DataLayer {
 
     return todo as Todo;
   }
+
+  async update(
+    todoId: string,
+    userId: string,
+    updateTodo: Partial<TodoUpdate>
+  ): Promise<Todo> {
+    const param = {
+      TableName: this.tableName,
+      Key: { todoId: todoId, userId: userId },
+      UpdateExpression: "set #name = :name, #dueDate = :dueDate, #done = :done",
+      ExpressionAttributeNames: {
+        "#name": "name",
+        "#dueDate": "dueDate",
+        "#done": "done",
+      },
+      ExpressionAttributeValues: {
+        ":name": updateTodo.name,
+        ":dueDate": updateTodo.dueDate,
+        ":done": updateTodo.done,
+      },
+      ReturnValues: "ALL_NEW",
+    };
+
+    const result = await this.docClient.update(param).promise();
+
+    this.logger.info(
+      `Successfully updated Todo: ${result.Attributes} for user: ${userId}`
+    );
+
+    return result.Attributes as Todo;
+  }
+
 }
