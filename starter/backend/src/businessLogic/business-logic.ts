@@ -44,4 +44,9 @@ export default class BusinessLogic {
 
     return await this.todoRepository.update(todoId, userId, todoUpdate);
   }
+
+  async delete(todoId: string, userId: string): Promise<any> {
+    this.logger.info(`Deleting todo: ${todoId} for user: ${userId}`);
+    return await this.todoRepository.delete(todoId, userId);
+  }
 }

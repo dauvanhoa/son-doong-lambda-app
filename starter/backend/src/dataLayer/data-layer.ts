@@ -77,4 +77,21 @@ export default class DataLayer {
     return result.Attributes as Todo;
   }
 
+  async delete(todoId: string, userId: string): Promise<any> {
+    const param = {
+      TableName: this.tableName,
+      Key: {
+        todoId: todoId,
+        userId: userId,
+      },
+    };
+
+    const result = await this.docClient.delete(param).promise();
+
+    this.logger.info(
+      `Successfully deleted Todo: ${result} for user: ${userId}`
+    );
+
+    return result;
+  }
 }
