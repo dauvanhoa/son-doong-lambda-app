@@ -1,14 +1,18 @@
-import { decode } from 'jsonwebtoken'
+import { decode, JwtPayload } from 'jsonwebtoken'
 import { createLogger } from '../utils/logger'
 
 const logger = createLogger('utils')
+
 /**
- * Parse a JWT token and return a user id
- * @param jwtToken JWT token to parse
- * @returns a user id from the JWT token
+ * Parse a user id from a JWT token
+ * @param jwtToken JWT token
+ * @returns a user id from a JWT token
  */
-export function parseUserId(jwtToken) {
-  const decodedJwt = decode(jwtToken)
-  logger.info("Decode JWT: ", decodedJwt)
-  return decodedJwt.sub
+export function parseUserId(jwtToken: string) {
+  // Decode the JWT token
+  const decodedJwt = decode(jwtToken) as JwtPayload;
+  logger.info("Decode JWT: ", decodedJwt);
+  
+  // Return the user id from the decoded JWT token
+  return decodedJwt.sub;
 }
