@@ -25,5 +25,14 @@
     "serverless-iam-roles-per-function": "^3.2.0",
     "uuid": "^9.0.0",
     "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.124",
+    "@types/node": "^20.8.6",
+    "@types/uuid": "^9.0.5",
+    "esbuild": "^0.19.4",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.2.2"
   }
 }
