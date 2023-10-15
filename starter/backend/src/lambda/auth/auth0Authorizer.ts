@@ -1,63 +1,105 @@
-import Axios from 'axios'
-import jsonwebtoken from 'jsonwebtoken'
-import { createLogger } from '../../utils/logger.mjs'
+import {
+  APIGatewayTokenAuthorizerEvent,
+  CustomAuthorizerResult,
+} from "aws-lambda";
+import Axios from "axios";
+import { JwtPayload, verify } from "jsonwebtoken";
+import { createLogger } from "../../utils/logger";
 
-const logger = createLogger('auth')
+const logger = createLogger("auth");
 
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+const jwksUrl = process.env.JWKS_URL;
 
-export async function handler(event) {
+// TODO: Implement tokenAuthorizer
+export const handler = async (
+  event: APIGatewayTokenAuthorizerEvent
+): Promise<CustomAuthorizerResult> => {
   try {
-    const jwtToken = await verifyToken(event.authorizationToken)
+    // Get the token from the header
+    const jwtToken = await verifyToken(event.authorizationToken);
+    logger.info(`User was authorized with JWT token: ${jwtToken}`);
 
     return {
       principalId: jwtToken.sub,
       policyDocument: {
-        Version: '2012-10-17',
+        Version: "2012-10-17",
         Statement: [
           {
-            Action: 'execute-api:Invoke',
-            Effect: 'Allow',
-            Resource: '*'
-          }
-        ]
-      }
-    }
+            Action: "execute-api:Invoke",
+            Effect: "Allow",
+            Resource: "*",
+          },
+        ],
+      },
+    };
   } catch (e) {
-    logger.error('User not authorized', { error: e.message })
-
+    logger.error(`Failed to login! Message: {e.message}`);
     return {
-      principalId: 'user',
+      principalId: "user",
       policyDocument: {
-        Version: '2012-10-17',
+        Version: "2012-10-17",
         Statement: [
           {
-            Action: 'execute-api:Invoke',
-            Effect: 'Deny',
-            Resource: '*'
-          }
-        ]
-      }
-    }
+            Action: "execute-api:Invoke",
+            Effect: "Deny",
+            Resource: "*",
+          },
+        ],
+      },
+    };
+  }
+};
+
+/**
+ * Verify token
+ * @param authHeader Authorization Token Header
+ * @returns JwtPayload
+ */
+async function verifyToken(authHeader) {
+  // TODO: Implement token verification
+  try {
+    // Get the token from the header
+    const token = getToken(authHeader);
+
+    // Get the JWKS from the endpoint
+    const res = await Axios.get(jwksUrl);
+
+    // Get the signing key from the JWKS endpoint
+    const pemData = res["data"]["keys"][0]["x5c"][0];
+
+    // Create the certificate
+    const cert = `-----BEGIN CERTIFICATE-----\n${pemData}\n-----END CERTIFICATE-----`;
+
+    // Verify the token using the cert from the jwks endpoint
+    return verify(token, cert, { algorithms: ["RS256"] }) as JwtPayload;
+  } catch (err) {
+    logger.error(`Failed to verify token! Message: ${err.message}`);
+    throw new Error("Failed to verify token");
   }
 }
 
-async function verifyToken(authHeader) {
-  const token = getToken(authHeader)
-  const jwt = jsonwebtoken.decode(token, { complete: true })
-
-  // TODO: Implement token verification
-  return undefined;
-}
-
+/**
+ * Get token from Authorization header
+ * @param authHeader Authorization Token Header
+ * @returns token
+ */
 function getToken(authHeader) {
-  if (!authHeader) throw new Error('No authentication header')
+  // Check if the header is undefined
+  if (!authHeader) {
+    logger.error("No authentication header");
+    throw new Error("No authentication header");
+  }
 
-  if (!authHeader.toLowerCase().startsWith('bearer '))
-    throw new Error('Invalid authentication header')
+  // Check if the header starts with "bearer "
+  if (!authHeader.toLowerCase().startsWith("bearer ")) {
+    logger.error("Invalid authentication header");
+    throw new Error("Invalid authentication header");
+  }
 
-  const split = authHeader.split(' ')
-  const token = split[1]
+  // Get the token from the header
+  const split = authHeader.split(" ");
+  const token = split[1];
 
-  return token
+  // Return the token
+  return token;
 }

@@ -22,7 +22,7 @@ provider:
   environment:
     S3_BUCKET_NAME: son-doong-bucket
     SIGNED_URL_EXPIRATION: 300
-    TODO_TABLE: SonDoongable
+    TODO_TABLE: SonDoongTable
     USER_ID_INDEX: SonDoongUserIdIndex
     JWKS_URL: https://dev-ubzav6t2jjro4wgw.us.auth0.com/.well-known/jwks.json
 
@@ -100,3 +100,28 @@ functions:
 resources:
   Resources:
     # TODO: Add any necessary AWS resources
+    # TODO: Create a DynamoDB table with local secondary index and a composite key
+    TodoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TODO_TABLE}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: todoId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: todoId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.USER_ID_INDEX}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: todoId
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
