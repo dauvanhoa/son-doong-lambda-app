@@ -29,4 +29,19 @@ export default class DataLayer {
 
     return result.Items as Todo[];
   }
+
+  async create(todo: Todo): Promise<Todo> {
+    const param = {
+      TableName: this.tableName,
+      Item: todo,
+    };
+
+    await this.docClient.put(param).promise();
+
+    this.logger.info(
+      `Successfully created Todo: ${todo} for user: ${todo.userId}`
+    );
+
+    return todo as Todo;
+  }
 }

@@ -1,7 +1,9 @@
 import Todo from "../models/todo";
 import DataLayer from "../dataLayer/data-layer";
 import { createLogger } from "../utils/logger";
-import { Logger } from "aws-xray-sdk-core";
+import { Logger } from "winston";
+import { v4 } from "uuid";
+import { TodoCreate } from "../models/todoCreate";
 
 export default class BusinessLogic {
   private logger: Logger;
@@ -15,5 +17,20 @@ export default class BusinessLogic {
     this.logger.info(`Getting all todos for user: ${userId}`);
 
     return this.todoRepository.getAll(userId);
+  }
+
+  async create(todoCreate: TodoCreate, userId: string): Promise<Todo> {
+    const todoId = v4();
+    const newTodo: Todo = Object.assign({}, todoCreate, {
+      todoId: todoId,
+      userId: userId,
+      createdAt: new Date().getTime().toString(),
+      attachmentUrl: "",
+      done: false,
+    });
+
+    this.logger.info(`Creating todo: ${newTodo} for user: ${userId}`);
+
+    return await this.todoRepository.create(newTodo);
   }
 }
