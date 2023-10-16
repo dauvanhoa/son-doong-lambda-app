@@ -10,8 +10,6 @@ const UploadState = {
   UploadingFile: 'UploadingFile'
 }
 
-const AUTH0_URL = process.env.AUTH0_URL;
-
 export function EditTodo() {
   function renderButton() {
     return (
